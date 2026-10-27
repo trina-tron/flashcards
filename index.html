@@ -42,6 +42,7 @@ label{display:flex;align-items:center;gap:5px}
 <label><input type="checkbox" id="pf"> Pinyin on front</label>
 <label><input type="checkbox" id="ap"> Auto-play audio</label>
 <label><input type="checkbox" id="slow"> Slow audio</label>
+<select id="voice" title="Voice"></select>
 <button id="shuf">Shuffle</button>
 </div>
 <div id="card" tabindex="0" aria-live="polite"></div>
@@ -453,7 +454,35 @@ if(!rev)h=flip?P+E:Z+(pf?P:"")+`<div class="hint">tap to flip</div>`;
 else h=flip?Z+P:E+`<div class="hint">tap to flip</div>`;
 $("card").innerHTML=h;$("cnt").textContent=(idx+1)+" / "+deck.length}
 function go(d){idx=(idx+d+deck.length)%deck.length;flip=false;render();auto()}
-function speak(){if(!("speechSynthesis" in window))return;const c=deck[idx];speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(c.z);u.lang="zh-CN";const v=speechSynthesis.getVoices().find(v=>v.lang.replace("_","-")==="zh-CN");if(v)u.voice=v;u.rate=$("slow").checked?0.6:0.9;speechSynthesis.speak(u)}
+
+let voices=[];
+function loadVoices(){
+  if(!("speechSynthesis" in window))return;
+  voices=speechSynthesis.getVoices().filter(v=>/^zh/i.test(v.lang.replace("_","-")));
+  const sel=$("voice");
+  let saved="";try{saved=localStorage.getItem("zhVoice")||""}catch(e){}
+  sel.innerHTML='<option value="">Auto (Lili first)</option>'+
+    voices.map(v=>`<option value="${v.voiceURI}">${v.name} (${v.lang})</option>`).join("");
+  sel.value=voices.some(v=>v.voiceURI===saved)?saved:"";
+}
+function pickVoice(){
+  const id=$("voice").value;
+  return voices.find(v=>v.voiceURI===id)
+    ||voices.find(v=>/lili/i.test(v.name))
+    ||voices.find(v=>/^zh[-_]TW/i.test(v.lang))
+    ||voices[0];
+}
+function speak(){
+  if(!("speechSynthesis" in window))return;
+  if(!voices.length)loadVoices();
+  const c=deck[idx],v=pickVoice();
+  const u=new SpeechSynthesisUtterance(c.z);
+  if(v){u.voice=v;u.lang=v.lang}else u.lang="zh-TW";
+  u.rate=$("slow").checked?0.6:0.9;
+  speechSynthesis.cancel();
+  setTimeout(()=>speechSynthesis.speak(u),50);
+}
+
 function auto(){if(!$("ap").checked)return;const rev=$("dir").value==="e";if((!rev&&!flip)||(rev&&flip))speak()}
 function flipCard(){flip=!flip;render();auto()}
 function shuffle(){for(let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]]}idx=0;flip=false;render()}
@@ -465,6 +494,12 @@ $("cat").onchange=()=>build();$("mode").onchange=()=>build();
 $("dir").onchange=()=>{flip=false;render()};$("pf").onchange=render;
 document.addEventListener("keydown",e=>{if(e.target.tagName==="SELECT")return;
 if(e.key==="ArrowRight")go(1);else if(e.key==="ArrowLeft")go(-1);else if(e.key===" "){e.preventDefault();flipCard()}});
+
+$("voice").onchange=()=>{try{localStorage.setItem("zhVoice",$("voice").value)}catch(e){}speak()};
+if("speechSynthesis" in window){
+  speechSynthesis.onvoiceschanged=loadVoices;
+  loadVoices();setTimeout(loadVoices,500);setTimeout(loadVoices,1500);
+}
 build();
 </script>
 </body>
