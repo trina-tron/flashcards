@@ -461,13 +461,14 @@ function loadVoices(){
   voices=speechSynthesis.getVoices().filter(v=>/^zh/i.test(v.lang.replace("_","-")));
   const sel=$("voice");
   let saved="";try{saved=localStorage.getItem("zhVoice")||""}catch(e){}
-  sel.innerHTML='<option value="">Auto (Lili first)</option>'+
+  sel.innerHTML='<option value="">Auto (Tingting first)</option>'+
     voices.map(v=>`<option value="${v.voiceURI}">${v.name} (${v.lang})</option>`).join("");
   sel.value=voices.some(v=>v.voiceURI===saved)?saved:"";
 }
 function pickVoice(){
   const id=$("voice").value;
   return voices.find(v=>v.voiceURI===id)
+    ||voices.find(v=>/ting-?ting/i.test(v.name))
     ||voices.find(v=>/lili/i.test(v.name))
     ||voices.find(v=>/^zh[-_]TW/i.test(v.lang))
     ||voices[0];
