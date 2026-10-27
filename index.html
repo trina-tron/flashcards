@@ -477,10 +477,10 @@ function speak(){
   if(!voices.length)loadVoices();
   const c=deck[idx],v=pickVoice();
   const u=new SpeechSynthesisUtterance(c.z);
-  if(v){u.voice=v;u.lang=v.lang}else u.lang="zh-TW";
+  if(v){u.voice=v;u.lang=v.lang}else u.lang="zh-CN";
   u.rate=$("slow").checked?0.6:0.9;
-  speechSynthesis.cancel();
-  setTimeout(()=>speechSynthesis.speak(u),50);
+  if(speechSynthesis.speaking||speechSynthesis.pending)speechSynthesis.cancel();
+  speechSynthesis.speak(u);
 }
 
 function auto(){if(!$("ap").checked)return;const rev=$("dir").value==="e";if((!rev&&!flip)||(rev&&flip))speak()}
