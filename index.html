@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Taiwan Mandarin Flashcards</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f6f4ef;--card:#fff;--ink:#222;--mute:#777;--line:#ddd8cc;--btn:#ece8dc;
+--t1:#2563eb;--t2:#16a34a;--t3:#9333ea;--t4:#dc2626;--t0:#8a8a8a}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17181b;--card:#222428;--ink:#eee;--mute:#999;--line:#383b41;--btn:#2d3036;
+--t1:#6ea0ff;--t2:#4cd07d;--t3:#c196ff;--t4:#ff7070;--t0:#9a9a9a}}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:-apple-system,"Segoe UI","PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;display:flex;flex-direction:column;align-items:center;padding:16px}
+h1{font-size:1.15rem;margin:4px 0 10px}
+.legend,.ctrl{display:flex;flex-wrap:wrap;gap:8px 14px;justify-content:center;font-size:.85rem;margin-bottom:10px}
+.legend b{font-weight:700}
+.t1{color:var(--t1)}.t2{color:var(--t2)}.t3{color:var(--t3)}.t4{color:var(--t4)}.t0{color:var(--t0)}
+select,button{font:inherit;background:var(--btn);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:8px 14px;cursor:pointer}
+label{display:flex;align-items:center;gap:5px}
+#card{width:100%;max-width:440px;min-height:300px;background:var(--card);border:1px solid var(--line);border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;cursor:pointer;user-select:none;margin:6px 0}
+.zh{font-size:3.2rem;font-weight:600;line-height:1.3;word-break:keep-all}
+.zh.long{font-size:2rem}
+.py{font-size:1.5rem;margin-top:8px;font-weight:600}
+.py.long{font-size:1.1rem}
+.py span{margin-right:.35em}
+.en{font-size:1.4rem;margin-top:10px}
+.hint{color:var(--mute);font-size:.8rem;margin-top:16px}
+.nav{display:flex;gap:10px;align-items:center;margin-top:4px}
+.cnt{color:var(--mute);min-width:84px;text-align:center;font-size:.9rem}
+.note{color:var(--mute);font-size:.78rem;max-width:440px;text-align:center;margin-top:14px}
+</style>
+</head>
+<body>
+<h1>🀄 Taiwan Mandarin Flashcards</h1>
+<div class="legend"><b class="t1">1st ˉ</b><b class="t2">2nd ˊ</b><b class="t3">3rd ˇ</b><b class="t4">4th ˋ</b><b class="t0">neutral</b></div>
+<div class="ctrl">
+<select id="cat"></select>
+<select id="mode"><option value="w">Words (300)</option><option value="s">Sentences (75)</option><option value="a">All (375)</option></select>
+<select id="dir"><option value="z">Chinese → English</option><option value="e">English → Chinese</option></select>
+<label><input type="checkbox" id="pf"> Pinyin on front</label>
+<label><input type="checkbox" id="ap"> Auto-play audio</label>
+<label><input type="checkbox" id="slow"> Slow audio</label>
+<button id="shuf">Shuffle</button>
+</div>
+<div id="card" tabindex="0" aria-live="polite"></div>
+<div class="nav"><button id="prev">←</button><button id="spk" aria-label="Play audio">🔊</button><span class="cnt" id="cnt"></span><button id="next">→</button></div>
+<div class="note">Tap the card or press Space to flip; use ← → keys to move. Tap 🔊 to hear the Chinese in a Taiwan Mandarin voice (needs a zh-TW voice on your device; on iPhone, turn off silent mode). ★ = especially Taiwan-flavored word. Colors follow the tone shown in the pinyin, so 不 and 一 show their spoken tone.</div>
+<script>
+const W=`我|wǒ|I / me
+你|nǐ|you
+他|tā|he / him
+她|tā|she / her
+我們|wǒ men|we
+你們|nǐ men|you (plural)
+他們|tā men|they
+朋友|péng you|friend
+老師|lǎo shī|teacher
+學生|xué sheng|student
+媽媽|mā ma|mom
+爸爸|bà ba|dad
+哥哥|gē ge|older brother
+姊姊|jiě jie|older sister
+弟弟|dì di|younger brother
+妹妹|mèi mei|younger sister
+兒子|ér zi|son
+女兒|nǚ ér|daughter
+是|shì|to be
+有|yǒu|to have
+去|qù|to go
+來|lái|to come
+吃|chī|to eat
+喝|hē|to drink
+看|kàn|to look / watch / read
+聽|tīng|to listen
+說|shuō|to speak
+讀|dú|to read aloud / study
+寫|xiě|to write
+買|mǎi|to buy
+做|zuò|to do / make
+喜歡|xǐ huan|to like
+想|xiǎng|to want to / to think
+要|yào|to want / need
+愛|ài|to love
+學|xué|to study / learn
+住|zhù|to live (reside)
+睡覺|shuì jiào|to sleep
+知道|zhī dào|to know
+大|dà|big
+小|xiǎo|small
+好|hǎo|good
+多|duō|many / much
+少|shǎo|few / little
+熱|rè|hot
+冷|lěng|cold
+高興|gāo xìng|happy
+累|lèi|tired
+快|kuài|fast
+新|xīn|new
+漂亮|piào liang|pretty
+今天|jīn tiān|today
+明天|míng tiān|tomorrow
+昨天|zuó tiān|yesterday
+現在|xiàn zài|now
+早上|zǎo shàng|morning
+晚上|wǎn shàng|evening
+年|nián|year
+月|yuè|month
+天|tiān|day / sky
+星期|xīng qí|week ★ (qí in Taiwan)
+家|jiā|home / family
+學校|xué xiào|school
+中國|Zhōng guó|China
+美國|Měi guó|United States
+台灣|Tái wān|Taiwan ★
+水|shuǐ|water
+書|shū|book
+車|chē|car
+錢|qián|money
+手機|shǒu jī|cell phone
+電腦|diàn nǎo|computer
+醫院|yī yuàn|hospital
+飯店|fàn diàn|restaurant / hotel
+工作|gōng zuò|work / job
+什麼|shén me|what
+誰|shéi|who
+哪裡|nǎ lǐ|where ★ (Taiwan prefers 哪裡)
+為什麼|wèi shén me|why
+怎麼|zěn me|how
+幾|jǐ|how many
+嗎|ma|question particle
+不|bù|not
+沒|méi|not (have)
+的|de|possessive particle
+了|le|completed-action particle
+很|hěn|very
+也|yě|also
+都|dōu|all / both
+和|hé|and
+你好|nǐ hǎo|hello
+謝謝|xiè xie|thank you
+不客氣|bú kè qi|you're welcome
+對不起|duì bu qǐ|sorry
+沒關係|méi guān xi|it's okay / no problem
+再見|zài jiàn|goodbye
+請|qǐng|please
+對|duì|correct / right
+好的|hǎo de|okay
+零|líng|zero
+一|yī|one
+二|èr|two
+三|sān|three
+四|sì|four
+五|wǔ|five
+六|liù|six
+七|qī|seven
+八|bā|eight
+九|jiǔ|nine
+十|shí|ten
+紅色|hóng sè|red
+藍色|lán sè|blue
+綠色|lǜ sè|green
+黃色|huáng sè|yellow
+黑色|hēi sè|black
+白色|bái sè|white
+紫色|zǐ sè|purple
+橘色|jú sè|orange ★
+米飯|mǐ fàn|cooked rice
+麵|miàn|noodles
+牛肉麵|niú ròu miàn|beef noodle soup ★
+滷肉飯|lǔ ròu fàn|braised pork rice ★
+小籠包|xiǎo lóng bāo|soup dumplings ★
+珍珠奶茶|zhēn zhū nǎi chá|bubble milk tea ★
+豆漿|dòu jiāng|soy milk ★
+臭豆腐|chòu dòu fu|stinky tofu ★
+夜市|yè shì|night market ★
+雞肉|jī ròu|chicken
+豬肉|zhū ròu|pork
+牛肉|niú ròu|beef
+魚|yú|fish
+蛋|dàn|egg
+蔬菜|shū cài|vegetables
+水果|shuǐ guǒ|fruit
+蘋果|píng guǒ|apple
+香蕉|xiāng jiāo|banana
+茶|chá|tea
+咖啡|kā fēi|coffee
+牛奶|niú nǎi|milk
+捷運|jié yùn|MRT / metro ★
+好吃|hǎo chī|delicious
+好喝|hǎo hē|tasty (drink)
+餓|è|hungry
+便當|biàn dāng|lunch box meal ★
+飯糰|fàn tuán|rice ball ★
+芒果冰|máng guǒ bīng|mango shaved ice ★
+麵包|miàn bāo|bread
+湯|tāng|soup
+便利商店|biàn lì shāng diàn|convenience store ★`;
+const S=`你好！|nǐ hǎo|Hello!
+你好嗎？|nǐ hǎo ma|How are you?
+我很好，謝謝。|wǒ hěn hǎo xiè xie|I'm very well, thanks.
+我住在美國。|wǒ zhù zài měi guó|I live in America.
+你叫什麼名字？|nǐ jiào shén me míng zi|What's your name?
+很高興認識你。|hěn gāo xìng rèn shi nǐ|Nice to meet you.
+我愛你。|wǒ ài nǐ|I love you.
+這是什麼？|zhè shì shén me|What is this?
+我想喝水。|wǒ xiǎng hē shuǐ|I want to drink water.
+你想吃什麼？|nǐ xiǎng chī shén me|What do you want to eat?
+我不去學校。|wǒ bú qù xué xiào|I'm not going to school.
+他是我的朋友。|tā shì wǒ de péng you|He is my friend.
+她是我的老師。|tā shì wǒ de lǎo shī|She is my teacher.
+我有一個哥哥。|wǒ yǒu yí gè gē ge|I have an older brother.
+今天很熱。|jīn tiān hěn rè|Today is very hot.
+我現在很累。|wǒ xiàn zài hěn lèi|I'm very tired now.
+明天你去哪裡？|míng tiān nǐ qù nǎ lǐ|Where are you going tomorrow?
+我喜歡看書。|wǒ xǐ huan kàn shū|I like reading books.
+我不知道。|wǒ bù zhī dào|I don't know.
+請再說一次。|qǐng zài shuō yí cì|Please say it again.
+你會說中文嗎？|nǐ huì shuō zhōng wén ma|Can you speak Chinese?
+我在學中文。|wǒ zài xué zhōng wén|I'm studying Chinese.
+這個多少錢？|zhè gè duō shǎo qián|How much is this?
+我常常來台灣。|wǒ cháng cháng lái tái wān|I often visit Taiwan.
+我想去夜市吃牛肉麵。|wǒ xiǎng qù yè shì chī niú ròu miàn|I want to go to the night market for beef noodles.
+不好意思，請問一下。|bù hǎo yì si qǐng wèn yí xià|Excuse me, may I ask something?
+請問洗手間在哪裡？|qǐng wèn xǐ shǒu jiān zài nǎ lǐ|Excuse me, where is the bathroom?
+你們有菜單嗎？|nǐ men yǒu cài dān ma|Do you have a menu?
+捷運站在哪裡？|jié yùn zhàn zài nǎ lǐ|Where is the MRT station?
+可以便宜一點嗎？|kě yǐ pián yi yì diǎn ma|Can it be a bit cheaper?
+我可以刷卡嗎？|wǒ kě yǐ shuā kǎ ma|Can I pay by card?
+你會說英文嗎？|nǐ huì shuō yīng wén ma|Do you speak English?
+我聽不懂。|wǒ tīng bu dǒng|I don't understand.
+請說慢一點。|qǐng shuō màn yì diǎn|Please speak more slowly.
+我要一杯珍珠奶茶。|wǒ yào yì bēi zhēn zhū nǎi chá|I'd like a bubble milk tea.
+我要這個。|wǒ yào zhè ge|I'll take this one.
+請給我菜單。|qǐng gěi wǒ cài dān|Please give me the menu.
+我們有兩個人。|wǒ men yǒu liǎng gè rén|There are two of us.
+買單，謝謝。|mǎi dān xiè xie|The check, please.
+這個辣嗎？|zhè ge là ma|Is this spicy?
+我不吃辣。|wǒ bù chī là|I don't eat spicy food.
+我吃素。|wǒ chī sù|I'm vegetarian.
+有沒有英文菜單？|yǒu méi yǒu yīng wén cài dān|Is there an English menu?
+請問，台北車站怎麼走？|qǐng wèn tái běi chē zhàn zěn me zǒu|Excuse me, how do I get to Taipei Main Station?
+離這裡遠嗎？|lí zhè lǐ yuǎn ma|Is it far from here?
+我要去機場。|wǒ yào qù jī chǎng|I want to go to the airport.
+我要去這個地址。|wǒ yào qù zhè ge dì zhǐ|I want to go to this address.
+請問幾點開門？|qǐng wèn jǐ diǎn kāi mén|What time does it open?
+現在幾點？|xiàn zài jǐ diǎn|What time is it now?
+我要一張票。|wǒ yào yì zhāng piào|I need one ticket.
+這裡可以拍照嗎？|zhè lǐ kě yǐ pāi zhào ma|Can I take photos here?
+可以幫我拍照嗎？|kě yǐ bāng wǒ pāi zhào ma|Could you take a photo for me?
+我的手機沒電了。|wǒ de shǒu jī méi diàn le|My phone is out of battery.
+這裡有無線網路嗎？|zhè lǐ yǒu wú xiàn wǎng lù ma|Is there wireless internet here?
+我迷路了。|wǒ mí lù le|I'm lost.
+請幫幫我。|qǐng bāng bang wǒ|Please help me.
+我住在這家飯店。|wǒ zhù zài zhè jiā fàn diàn|I'm staying at this hotel.
+附近有便利商店嗎？|fù jìn yǒu biàn lì shāng diàn ma|Is there a convenience store nearby?
+謝謝你的幫忙。|xiè xie nǐ de bāng máng|Thanks for your help.
+我來看我的姊姊。|wǒ lái kàn wǒ de jiě jie|I'm here to visit my sister.
+我姊姊住在台灣。|wǒ jiě jie zhù zài tái wān|My sister lives in Taiwan.
+我住在美國，但是常常來台灣。|wǒ zhù zài měi guó dàn shì cháng cháng lái tái wān|I live in America but visit Taiwan often.
+你是台灣人嗎？|nǐ shì tái wān rén ma|Are you Taiwanese?
+我是美國人。|wǒ shì měi guó rén|I'm American.
+你住在哪裡？|nǐ zhù zài nǎ lǐ|Where do you live?
+我住在加州。|wǒ zhù zài jiā zhōu|I live in California.
+我很喜歡台灣。|wǒ hěn xǐ huan tái wān|I really like Taiwan.
+台灣人很友善。|tái wān rén hěn yǒu shàn|Taiwanese people are very friendly.
+台灣的食物很好吃。|tái wān de shí wù hěn hǎo chī|Taiwan's food is delicious.
+你可以推薦餐廳嗎？|nǐ kě yǐ tuī jiàn cān tīng ma|Can you recommend a restaurant?
+我的中文不太好。|wǒ de zhōng wén bú tài hǎo|My Chinese isn't very good.
+你的英文很好。|nǐ de yīng wén hěn hǎo|Your English is good.
+你做什麼工作？|nǐ zuò shén me gōng zuò|What do you do for work?
+我下次再來。|wǒ xià cì zài lái|I'll come again next time.
+祝你有美好的一天！|zhù nǐ yǒu měi hǎo de yì tiān|Have a nice day!`;
+const B={"我":"People & Pronouns","媽媽":"Family","是":"Verbs","大":"Adjectives","今天":"Time","家":"Places & Things","什麼":"Questions & Grammar","你好":"Greetings & Phrases","零":"Numbers","紅色":"Colors","米飯":"Food & Drink","捷運":"Transportation","好吃":"Food & Drink","便利商店":"Shopping & Money"};
+const W2=`#Transportation
+火車|huǒ chē|train
+高鐵|gāo tiě|high-speed rail ★
+公車|gōng chē|bus ★
+計程車|jì chéng chē|taxi ★
+機車|jī chē|scooter / motorbike ★
+腳踏車|jiǎo tà chē|bicycle ★
+飛機|fēi jī|airplane
+機場|jī chǎng|airport
+車站|chē zhàn|station
+悠遊卡|yōu yóu kǎ|EasyCard (transit card) ★
+票|piào|ticket
+路|lù|road / way
+#Directions & Places
+左邊|zuǒ biān|left side
+右邊|yòu biān|right side
+前面|qián miàn|in front / ahead
+旁邊|páng biān|beside
+附近|fù jìn|nearby
+遠|yuǎn|far
+洗手間|xǐ shǒu jiān|restroom
+廁所|cè suǒ|toilet
+銀行|yín háng|bank
+公園|gōng yuán|park
+廟|miào|temple ★
+#Hotel & Travel
+旅館|lǚ guǎn|hotel / inn
+房間|fáng jiān|room
+護照|hù zhào|passport
+行李|xíng li|luggage
+地圖|dì tú|map
+照片|zhào piàn|photo
+旅行|lǚ xíng|to travel
+觀光|guān guāng|sightseeing
+景點|jǐng diǎn|tourist attraction ★
+預約|yù yuē|reservation
+訂位|dìng wèi|to book a table ★
+鑰匙|yào shi|key
+#Shopping & Money
+便宜|pián yi|cheap
+貴|guì|expensive
+刷卡|shuā kǎ|pay by card
+現金|xiàn jīn|cash
+發票|fā piào|receipt (lottery numbers) ★
+袋子|dài zi|bag
+塑膠袋|sù jiāo dài|plastic bag ★
+衣服|yī fu|clothes
+鞋子|xié zi|shoes
+禮物|lǐ wù|gift
+紀念品|jì niàn pǐn|souvenir
+打折|dǎ zhé|discount ★
+#Food & Drink
+早餐|zǎo cān|breakfast
+午餐|wǔ cān|lunch
+晚餐|wǎn cān|dinner
+菜單|cài dān|menu
+餐廳|cān tīng|restaurant
+筷子|kuài zi|chopsticks
+杯子|bēi zi|cup
+甜|tián|sweet
+辣|là|spicy
+鹹|xián|salty
+酸|suān|sour
+去冰|qù bīng|no ice ★
+少糖|shǎo táng|less sugar ★
+無糖|wú táng|no sugar ★
+鹽酥雞|yán sū jī|salt & pepper fried chicken ★
+蚵仔煎|é zǎi jiān|oyster omelet ★
+鳳梨酥|fèng lí sū|pineapple cake ★
+刨冰|bào bīng|shaved ice ★
+芒果|máng guǒ|mango
+餃子|jiǎo zi|dumplings
+#Body & Health
+頭|tóu|head
+眼睛|yǎn jing|eyes
+手|shǒu|hand
+腳|jiǎo|foot / leg
+肚子|dù zi|stomach / belly
+身體|shēn tǐ|body
+醫生|yī shēng|doctor
+藥|yào|medicine
+藥局|yào jú|pharmacy
+痛|tòng|pain / hurts
+生病|shēng bìng|to be sick
+感冒|gǎn mào|a cold
+#Emergency & Help
+幫忙|bāng máng|to help
+警察|jǐng chá|police
+救護車|jiù hù chē|ambulance
+危險|wēi xiǎn|dangerous
+小心|xiǎo xīn|careful
+迷路|mí lù|to get lost
+#Weather & Nature
+天氣|tiān qì|weather
+下雨|xià yǔ|to rain
+太陽|tài yáng|sun
+風|fēng|wind
+颱風|tái fēng|typhoon ★
+雲|yún|cloud
+山|shān|mountain
+海|hǎi|sea
+花|huā|flower
+樹|shù|tree
+#Verbs
+給|gěi|to give
+找|zhǎo|to look for
+問|wèn|to ask
+走|zǒu|to walk / go
+坐|zuò|to sit / ride
+等|děng|to wait
+幫|bāng|to help
+用|yòng|to use
+開|kāi|to open / drive
+玩|wán|to play / have fun
+會|huì|can / know how to
+可以|kě yǐ|may / can
+需要|xū yào|to need
+認識|rèn shi|to know (someone)
+#Adjectives
+好看|hǎo kàn|good-looking
+有趣|yǒu qù|interesting / fun
+難|nán|difficult
+容易|róng yì|easy
+忙|máng|busy
+慢|màn|slow
+方便|fāng biàn|convenient
+超|chāo|super / very ★
+蠻|mán|quite ★
+太|tài|too / so
+#Time
+上午|shàng wǔ|morning (AM)
+下午|xià wǔ|afternoon
+中午|zhōng wǔ|noon
+點|diǎn|o'clock / point
+週末|zhōu mò|weekend
+下次|xià cì|next time
+常常|cháng cháng|often
+禮拜|lǐ bài|week / day of week ★
+#Numbers
+百|bǎi|hundred
+萬|wàn|ten thousand
+兩|liǎng|two (counting)
+半|bàn|half
+個|gè|measure word (general)
+杯|bēi|cup / glass (measure)
+塊|kuài|dollar (spoken NT$) ★
+台幣|Tái bì|NT dollars ★
+#Greetings & Phrases
+請問|qǐng wèn|excuse me / may I ask
+不好意思|bù hǎo yì si|sorry / excuse me ★
+麻煩你|má fan nǐ|sorry to trouble you ★
+沒問題|méi wèn tí|no problem
+歡迎|huān yíng|welcome
+早安|zǎo ān|good morning
+晚安|wǎn ān|good night
+加油|jiā yóu|you can do it! ★
+拜拜|bái bai|bye-bye ★
+#People & Pronouns
+先生|xiān sheng|Mr. / sir
+小姐|xiǎo jie|Miss / young woman
+人|rén|person
+小孩|xiǎo hái|child
+老闆|lǎo bǎn|boss / owner
+外國人|wài guó rén|foreigner`;
+function parse(t,s,b){let cat="";return t.split("\n").filter(l=>l.trim()).map(l=>{if(l[0]==="#"){cat=l.slice(1);return null}const [z,p,e]=l.split("|");if(b&&B[z])cat=B[z];return{z,p,e,s,c:cat}}).filter(Boolean)}
+const WORDS=[...parse(W,0,1),...parse(W2,0,0)],SENT=parse(S,1,0);
+function tone(s){const n=s.normalize("NFD");if(/\u0304/.test(n))return 1;if(/\u0301/.test(n))return 2;if(/\u030C/.test(n))return 3;if(/\u0300/.test(n))return 4;return 0}
+const PUNCT=/[，。！？、]/;
+function zh(c){const sy=c.p.split(" ");let i=0;return Array.from(c.z).map(ch=>PUNCT.test(ch)?ch:`<span class="t${tone(sy[i++]||"")}">${ch}</span>`).join("")}
+function py(c){return c.p.split(" ").map(s=>`<span class="t${tone(s)}">${s}</span>`).join("")}
+const $=id=>document.getElementById(id);
+let deck=[],idx=0,flip=false;
+function build(keep){const m=$("mode").value,c=$("cat").value;$("cat").disabled=m==="s";const wd=c==="all"?WORDS:WORDS.filter(x=>x.c===c);deck=m==="w"?[...wd]:m==="s"?[...SENT]:c==="all"?[...WORDS,...SENT]:[...wd];if(!keep)idx=0;flip=false;render()}
+function render(){const c=deck[idx],long=Array.from(c.z).length>5,rev=$("dir").value==="e",pf=$("pf").checked;
+const Z=`<div class="zh${long?" long":""}">${zh(c)}</div>`,P=`<div class="py${long?" long":""}">${py(c)}</div>`,E=`<div class="en">${c.e}</div>`;
+let h;
+if(!rev)h=flip?P+E:Z+(pf?P:"")+`<div class="hint">tap to flip</div>`;
+else h=flip?Z+P:E+`<div class="hint">tap to flip</div>`;
+$("card").innerHTML=h;$("cnt").textContent=(idx+1)+" / "+deck.length}
+function go(d){idx=(idx+d+deck.length)%deck.length;flip=false;render();auto()}
+function speak(){if(!("speechSynthesis" in window))return;const c=deck[idx];speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(c.z);u.lang="zh-TW";const v=speechSynthesis.getVoices().find(v=>v.lang.replace("_","-")==="zh-TW");if(v)u.voice=v;u.rate=$("slow").checked?0.6:0.9;speechSynthesis.speak(u)}
+function auto(){if(!$("ap").checked)return;const rev=$("dir").value==="e";if((!rev&&!flip)||(rev&&flip))speak()}
+function flipCard(){flip=!flip;render();auto()}
+function shuffle(){for(let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]]}idx=0;flip=false;render()}
+$("card").onclick=flipCard;$("spk").onclick=speak;
+$("next").onclick=()=>go(1);$("prev").onclick=()=>go(-1);
+$("shuf").onclick=shuffle;
+const cats=[...new Set(WORDS.map(x=>x.c))];$("cat").innerHTML='<option value="all">All categories ('+WORDS.length+')</option>'+cats.map(c=>`<option value="${c}">${c} (${WORDS.filter(x=>x.c===c).length})</option>`).join("");
+$("cat").onchange=()=>build();$("mode").onchange=()=>build();
+$("dir").onchange=()=>{flip=false;render()};$("pf").onchange=render;
+document.addEventListener("keydown",e=>{if(e.target.tagName==="SELECT")return;
+if(e.key==="ArrowRight")go(1);else if(e.key==="ArrowLeft")go(-1);else if(e.key===" "){e.preventDefault();flipCard()}});
+build();
+</script>
+</body>
+</html>
