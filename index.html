@@ -46,7 +46,7 @@ label{display:flex;align-items:center;gap:5px}
 </div>
 <div id="card" tabindex="0" aria-live="polite"></div>
 <div class="nav"><button id="prev">←</button><button id="spk" aria-label="Play audio">🔊</button><span class="cnt" id="cnt"></span><button id="next">→</button></div>
-<div class="note">Tap the card or press Space to flip; use ← → keys to move. Tap 🔊 to hear the Chinese in a Taiwan Mandarin voice (needs a zh-TW voice on your device; on iPhone, turn off silent mode). ★ = especially Taiwan-flavored word. Colors follow the tone shown in the pinyin, so 不 and 一 show their spoken tone.</div>
+<div class="note">Tap the card or press Space to flip; use ← → keys to move. Tap 🔊 to hear the Chinese in a Taiwan Mandarin voice (turn off silent mode). ★ = especially Taiwan-flavored word. Colors follow the tone shown in the pinyin, so 不 and 一 show their spoken tone.</div>
 <script>
 const W=`我|wǒ|I / me
 你|nǐ|you
@@ -453,7 +453,7 @@ if(!rev)h=flip?P+E:Z+(pf?P:"")+`<div class="hint">tap to flip</div>`;
 else h=flip?Z+P:E+`<div class="hint">tap to flip</div>`;
 $("card").innerHTML=h;$("cnt").textContent=(idx+1)+" / "+deck.length}
 function go(d){idx=(idx+d+deck.length)%deck.length;flip=false;render();auto()}
-function speak(){if(!("speechSynthesis" in window))return;const c=deck[idx];speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(c.z);u.lang="zh-TW";const v=speechSynthesis.getVoices().find(v=>v.lang.replace("_","-")==="zh-TW");if(v)u.voice=v;u.rate=$("slow").checked?0.6:0.9;speechSynthesis.speak(u)}
+function speak(){if(!("speechSynthesis" in window))return;const c=deck[idx];speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(c.z);u.lang="zh-CN";const v=speechSynthesis.getVoices().find(v=>v.lang.replace("_","-")==="zh-CN");if(v)u.voice=v;u.rate=$("slow").checked?0.6:0.9;speechSynthesis.speak(u)}
 function auto(){if(!$("ap").checked)return;const rev=$("dir").value==="e";if((!rev&&!flip)||(rev&&flip))speak()}
 function flipCard(){flip=!flip;render();auto()}
 function shuffle(){for(let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]]}idx=0;flip=false;render()}
